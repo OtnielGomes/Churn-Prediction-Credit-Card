@@ -694,6 +694,80 @@ class GraphicsData:
             print(f'[Error] Failed to generate correlation heatmap: {str(e)}.')
 
 
+
+    # ======================================================== #
+    # Scatterplots vs Reference - Function                     #
+    # ======================================================== #
+    def scatterplots_vs_reference(
+            self, 
+            x_reference: str,
+            hue: str = None,
+            exclude_cols: list = [],
+            num_columns: int = 3,
+            figsize_per_row: int = 6,
+            palette: list = ['#1abc9c', '#ff6b6b'],
+            title: str = 'Scatterplot of Numerical Variables vs Reference'
+        ):
+            """
+            Plots scatterplots comparing numerical variables against a reference variable,
+            optionally grouped by a hue variable.
+
+            This method creates scatterplots of all numerical columns (excluding specified ones)
+            against a single reference numerical column on the X-axis. Points can be colored by
+            a categorical hue variable.
+
+            Args:
+                x_reference (str): Column name to be used as X-axis in all scatterplots.
+                hue (str, optional): Column name used for grouping/coloring points. Defaults to None.
+                exclude_cols (list, optional): List of columns to exclude from Y-axis candidates,
+                    in addition to `x_reference` and `hue`. Defaults to empty list.
+                num_columns (int): Number of plots per row in the subplot grid.
+                figsize_per_row (int): Height (in inches) allocated per subplot row.
+                palette (list, optional): List of colors for the hue categories. Defaults to ['#b0ff9d', '#db5856'].
+                title (str): Overall title for the figure.
+
+            Raises:
+                ValueError: If `x_reference` or `hue` (when specified) are not found in the DataFrame.
+                Exception: For any other errors during plotting.
+
+            """
+            try:
+                # Entry checks
+                if x_reference not in self.data.columns:
+                    raise ValueError(f"Column '{x_reference}' not found in the DataFrame.")
+            
+                if hue and hue not in self.data.columns:
+                    raise ValueError(f"Column '{hue}' not found in the DataFrame.")
+
+                numeric_cols = self.data.select_dtypes(include = 'number').columns.tolist()
+                for col in [x_reference, hue] + exclude_cols:
+                    if col in numeric_cols:
+                        numeric_cols.remove(col)
+
+                # Define AX and Fig
+                fig, ax = self._initializer_subplot_grid(num_columns, figsize_per_row)
+
+                for i, column in enumerate(numeric_cols):
+                    sns.scatterplot(
+                        data = self.data,
+                        x = x_reference,
+                        y = column,
+                        hue = hue,
+                        palette = palette if hue else None,
+                        ax = ax[i]
+                    )
+
+                    # Config Ax's
+                    self._format_single_ax(ax[i], f'{column} x {x_reference}')
+                    ax[i].set_xticklabels([])
+                    ax[i].set_yticklabels([])
+                    sns.despine(ax = ax[i], top = True, right = True, left = True, bottom = True)
+
+                # Show Graphics
+                self._finalize_subplot_layout(fig, ax, i, title = title)
+            except Exception as e:
+                print(f'[ERROR] Failed to generate scatterplots vs reference: {str(e)}.') 
+
     # ======================================================== #
     # Models Performance Barplots - Function                   #
     # ======================================================== #
