@@ -18,105 +18,170 @@ from sklearn.utils.validation import check_is_fitted
 # ======================================================== #
 # Class FeatureEngineer                                    #
 # ======================================================== #
-import numpy as np
-import pandas as pd
-
-from sklearn.base import BaseEstimator, TransformerMixin
-
-
 class FeatureEngineer(BaseEstimator, TransformerMixin):
     """
-    Custom feature engineering transformer for the Telecom Churn dataset.
+    Custom feature engineering transformer for a credit card churn dataset.
 
-    This transformer creates:
-    - total_spend
-    - share_longmon, share_tollmon, share_equipmon, share_cardmon, share_wiremon
-    - nonzero_count
-    - flag_used_longmon, flag_used_tollmon, flag_used_equipmon, flag_used_cardmon, flag_used_wiremon
-    - tenure_band
-    - total_spend_per_tenure
-    - tenure_x_internet, tenure_x_wireless, tenure_x_ebill, tenure_x_equip
-    - total_services
-    - legacy_bundle
-    - legacy_bundle_no_internet
-    - stability_index_raw
-    - income_per_age
-    - income_per_ed
-    - ed_income_bucket
-    - young_low_tenure
-    - old_upper_tenure
-    - toxic_score
+    This transformer creates ratio, interaction, binary, and ordinal features
+    from customer transaction, balance, tenure, and activity variables. It is
+    designed to be compatible with scikit-learn pipelines.
 
-    Leakage-sensitive thresholds are learned only on training data in fit():
-    - age and tenure quartiles
-    - income bin edges within each education group
+    Created features
+    ----------------
+    Ratio / percentage features:
+    - avg_ticket
+    - inactive_per_tenure
+
+    Interaction / combination features:
+    - total_spending
+    - change_gap_amt_ct
+    - utilization_amont
+    - credit_revolving
+
+    Binary features / flags:
+    - months_inactive_12_mon_0
+    - contacts_count_12_mon_0
+    - dependent_count_0
+    - total_revolving_bal_0
+    - total_amt_chng_q4_q1_0
+    - total_ct_chng_q4_q1_0
+    - avg_utilization_ratio_0
+    - low_activity_low_value_flag
+    - is_pos_graduate
+    - total_amt_q75
+    - total_ct_q75
+
+    Bucket / ordinal features:
+    - trans_ct_bucket
+    - trans_amt_bucket
+    - tenure_bucket
+
+    Notes
+    -----
+    The quantile boundaries used to build `low_activity_low_value_flag` are
+    learned only during `fit()` from the training data and reused in
+    `transform()`. This helps prevent leakage between training and validation
+    or test sets.
+
+    Infinite values are replaced and numeric missing values are filled during
+    the final cleanup step.
+
+    Parameters
+    ----------
+    quantiles : int, default=4
+        Number of quantile groups used to estimate the thresholds for
+        `low_activity_low_value_flag`.
+
+    fill_value : float, default=0.0
+        Value used to fill missing numeric values after feature generation.
+
+    return_copy : bool, default=True
+        If True, returns a copy of the input DataFrame. If False, transformations
+        are applied in place when possible.
+
+    Attributes
+    ----------
+    util_bins_ : ndarray or None
+        Quantile bin edges learned from `avg_utilization_ratio`.
+
+    revol_bins_ : ndarray or None
+        Quantile bin edges learned from `total_revolving_bal`.
+
+    amt_bins_ : ndarray or None
+        Quantile bin edges learned from `total_trans_amt`.
+
+    relation_bins_ : ndarray or None
+        Quantile bin edges learned from `total_relationship_count`.
+
+    trans_bins_ : ndarray or None
+        Quantile bin edges learned from `total_trans_ct`.
     """
 
     def __init__(
         self,
-        mon_cols=None,
-        service_cols=None,
-        tec_cols=None,
-        eps=1e-6,
-        tenure_bins=None,
-        tenure_labels=None,
-        ed_income_q=4,
-        fill_value=0.0,
-        return_copy=True
+        quantiles = 4,
+        fill_value = 0.0,
+        return_copy = True
     ):
-        self.mon_cols = mon_cols or ['longmon', 'tollmon', 'equipmon', 'cardmon', 'wiremon']
-        self.service_cols = service_cols or [
-            'ebill', 'equip', 'callcard', 'wireless', 'pager',
-            'internet', 'voice', 'callwait', 'confer'
-        ]
-        self.tec_cols = tec_cols or ['internet', 'wireless', 'ebill', 'equip']
-        self.toxic_cols = ['internet', 'wireless', 'equip', 'voice', 'pager']
-
-        self.eps = eps
-        self.tenure_bins = tenure_bins or [-np.inf, 3, 6, 12, 24, 48, np.inf]
-        self.tenure_labels = tenure_labels or ['0-3', '4-6', '7-12', '13-24', '25-48', '49+']
-        self.ed_income_q = ed_income_q
+        self.quantiles = quantiles
         self.fill_value = fill_value
         self.return_copy = return_copy
 
-    def fit(self, X, y=None):
+    def fit(self, X, y = None):
+
+        """
+        Learn quantile bin edges from the training data.
+
+        This method estimates the quantile boundaries required to create the
+        `low_activity_low_value_flag` feature. The learned boundaries are stored
+        as fitted attributes and later reused in `transform()` so that the same
+        thresholds are applied consistently to new data.
+
+        Parameters
+        ----------
+        X : pandas.DataFrame or array-like of shape (n_samples, n_features)
+            Input data used to learn quantile thresholds.
+
+        y : array-like of shape (n_samples,), default=None
+            Ignored. Present only for scikit-learn API compatibility.
+
+        Returns
+        -------
+        self : FeatureEngineer
+            Fitted transformer.
+        """
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
 
         X_ = X.copy()
 
-        if 'age' in X_.columns:
-            self.age_q25_ = float(X_['age'].quantile(0.25))
-            self.age_q75_ = float(X_['age'].quantile(0.75))
-        else:
-            self.age_q25_ = None
-            self.age_q75_ = None
+        # Save quantiles only from training
+        self.util_bins_ = None
+        self.revol_bins_ = None
+        self.amt_bins_ = None
+        self.relation_bins_ = None
+        self.trans_bins_ = None
 
-        if 'tenure' in X_.columns:
-            self.tenure_q25_ = float(X_['tenure'].quantile(0.25))
-            self.tenure_q75_ = float(X_['tenure'].quantile(0.75))
-        else:
-            self.tenure_q25_ = None
-            self.tenure_q75_ = None
+        # It only calculates if the columns exist.
+        if 'avg_utilization_ratio' in X_.columns:
+            self.util_bins_ = pd.qcut(
+                X_['avg_utilization_ratio'],
+                q = self.quantiles,
+                duplicates = 'drop',
+                retbins = True
+            )[1]
 
-        self.ed_income_edges_ = {}
+        if 'total_revolving_bal' in X_.columns:
+            self.revol_bins_ = pd.qcut(
+                X_['total_revolving_bal'],
+                q = self.quantiles,
+                duplicates = 'drop',
+                retbins = True
+            )[1]
 
-        if ('ed' in X_.columns) and ('income' in X_.columns):
-            for ed_value, grp in X_.groupby('ed', dropna = False):
-                s = grp['income'].astype('float64').dropna()
+        if 'total_trans_amt' in X_.columns:
+            self.amt_bins_ = pd.qcut(
+                X_['total_trans_amt'],
+                q = self.quantiles,
+                duplicates = 'drop',
+                retbins = True
+            )[1]
 
-                if s.nunique() < 2:
-                    self.ed_income_edges_[ed_value] = None
-                    continue
+        if 'total_relationship_count' in X_.columns:
+            self.relation_bins_ = pd.qcut(
+                X_['total_relationship_count'],
+                q = self.quantiles,
+                duplicates = 'drop',
+                retbins = True
+            )[1]
 
-                qs = np.linspace(0, 1, self.ed_income_q + 1)
-                edges = s.quantile(qs).to_numpy()
-                edges = np.unique(edges[~np.isnan(edges)])
-
-                if len(edges) < 2:
-                    self.ed_income_edges_[ed_value] = None
-                else:
-                    self.ed_income_edges_[ed_value] = edges.tolist()
+        if 'total_trans_ct' in X_.columns:
+            self.trans_bins_ = pd.qcut(
+                X_['total_trans_ct'],
+                q = self.quantiles,
+                duplicates = 'drop',
+                retbins = True
+            )[1]
 
         return self
 
@@ -127,178 +192,229 @@ class FeatureEngineer(BaseEstimator, TransformerMixin):
         X = X.copy() if self.return_copy else X
 
         try:
-            # --------------------------
-            # 1) Aggregations of costs
-            # --------------------------
-            existing_mon = [c for c in self.mon_cols if c in X.columns]
-
-            if existing_mon:
-                X['total_spend'] = X[existing_mon].sum(axis=1).astype('float32')
-            else:
-                X['total_spend'] = np.float32(0.0)
-
-            denom = (X['total_spend'].astype('float32') + np.float32(self.eps))
-
-            for col in self.mon_cols:
-                if col in X.columns:
-                    X[f'share_{col}'] = (X[col].astype('float32') / denom).astype('float32')
-                else:
-                    X[f'share_{col}'] = np.float32(0.0)
-
-            if existing_mon:
-                X['nonzero_count'] = (X[existing_mon] > 0).sum(axis=1).astype('int32')
-            else:
-                X['nonzero_count'] = np.int32(0)
-
-            for col in self.mon_cols:
-                if col in X.columns:
-                    x = X[col].fillna(0)
-                    X[f'flag_used_{col}'] = (x > 0).astype('int8')
-                else:
-                    X[f'flag_used_{col}'] = np.int8(0)
-
-            # --------------------------
-            # 2) Tenure features
-            # --------------------------
-            if 'tenure' in X.columns:
-                X['tenure_band'] = pd.cut(
-                    X['tenure'],
-                    bins=self.tenure_bins,
-                    labels=self.tenure_labels,
-                    include_lowest=True
-                )
-
-                X['total_spend_per_tenure'] = (
-                    X['total_spend'].astype('float32') /
-                    (X['tenure'].fillna(0).astype('float32') + 1.0)
+            # =========================================================
+            # A. Percentage/Ratio Features
+            # =========================================================
+            if {'total_trans_amt', 'total_trans_ct'}.issubset(X.columns):
+                X['avg_ticket'] = (
+                    X['total_trans_amt'].astype('float64') /
+                    X['total_trans_ct'].replace(0, np.nan).astype('float64')
                 ).astype('float32')
             else:
-                X['tenure_band'] = pd.Series([pd.NA] * len(X), index=X.index)
-                X['total_spend_per_tenure'] = np.float32(0.0)
+                X['avg_ticket'] = np.float32(0.0)
 
-            for col in self.tec_cols:
-                if ('tenure' in X.columns) and (col in X.columns):
-                    X[f'tenure_x_{col}'] = (
-                        X['tenure'].fillna(0).astype('float32') *
-                        X[col].fillna(0).astype('float32')
-                    ).astype('int32')
-                else:
-                    X[f'tenure_x_{col}'] = np.int32(0)
 
-            # --------------------------
-            # 3) Portfolio / bundles
-            # --------------------------
-            for col in self.service_cols:
-                if col not in X.columns:
-                    X[col] = 0
-
-            X[self.service_cols] = X[self.service_cols].fillna(0).astype('int32')
-            X['total_services'] = X[self.service_cols].sum(axis=1).astype('int32')
-
-            X['legacy_bundle'] = (
-                (X['pager'] == 1) & (X['callcard'] == 1)
-            ).astype('int8')
-
-            X['legacy_bundle_no_internet'] = (
-                (X['pager'] == 1) &
-                (X['callcard'] == 1) &
-                (X['internet'] == 0)
-            ).astype('int8')
-
-            # --------------------------
-            # 4) Demographics / proxies
-            # --------------------------
-            if ('address' in X.columns) and ('employ' in X.columns):
-                X['stability_index_raw'] = (
-                    X['address'].fillna(0) + X['employ'].fillna(0)
-                )
-            else:
-                X['stability_index_raw'] = np.int32(0)
-
-            if ('income' in X.columns) and ('age' in X.columns):
-                X['income_per_age'] = (
-                    X['income'].fillna(0) / (X['age'].fillna(0) + 1)
+            if {'months_on_book', 'months_inactive_12_mon'}.issubset(X.columns):
+                X['inactive_per_tenure'] = (
+                    X['months_on_book'].astype('float64') /
+                    X['months_inactive_12_mon'].replace(0, np.nan).astype('float64')
                 ).astype('float32')
             else:
-                X['income_per_age'] = np.float32(0.0)
+                X['inactive_per_tenure'] = np.float32(0.0)
 
-            if ('income' in X.columns) and ('ed' in X.columns):
-                ed_safe = X['ed'].astype('float64').replace(0, np.nan)
-                X['income_per_ed'] = (
-                    X['income'].astype('float64') / ed_safe
-                ).fillna(0).astype('float32')
+            # =========================================================
+            # B. Interaction/Combination Features
+            # =========================================================
+            if {'total_trans_amt', 'total_revolving_bal'}.issubset(X.columns):
+                X['total_spending'] = (
+                    X['total_trans_amt'].astype('float64') +
+                    X['total_revolving_bal'].astype('float64')
+                ).astype('float32')
             else:
-                X['income_per_ed'] = np.float32(0.0)
+                X['total_spending'] = np.float32(0.0)
 
-            # --------------------------
-            # 5) Income buckets within education
-            # --------------------------
-            if ('ed' in X.columns) and ('income' in X.columns) and hasattr(self, 'ed_income_edges_'):
-                bucket = pd.Series(-1, index=X.index, dtype='int32')
 
-                for ed_value, edges in self.ed_income_edges_.items():
-                    if edges is None or len(edges) < 2:
-                        continue
-
-                    mask = X['ed'].eq(ed_value)
-                    if not mask.any():
-                        continue
-
-                    cut_values = pd.cut(
-                        X.loc[mask, 'income'].astype('float64'),
-                        bins=edges,
-                        labels=False,
-                        include_lowest=True
-                    )
-
-                    bucket.loc[mask] = cut_values.fillna(-1).astype('int32')
-
-                X['ed_income_bucket'] = bucket
+            if {'total_amt_chng_q4_q1', 'total_ct_chng_q4_q1'}.issubset(X.columns):
+                X['change_gap_amt_ct'] = (
+                    X['total_amt_chng_q4_q1'].astype('float64') +
+                    X['total_ct_chng_q4_q1'].astype('float64')
+                ).astype('float32')
             else:
-                X['ed_income_bucket'] = pd.Series(-1, index=X.index, dtype='int32')
+                X['change_gap_amt_ct'] = np.float32(0.0)
 
-            # --------------------------
-            # 6) Region flags learned on train only
-            # --------------------------
-            if (
-                ('age' in X.columns) and
-                ('tenure' in X.columns) and
-                (self.age_q25_ is not None) and
-                (self.tenure_q25_ is not None)
-            ):
-                X['young_low_tenure'] = (
-                    (X['age'] < self.age_q25_) &
-                    (X['tenure'] < self.tenure_q25_)
+
+            if {'credit_limit', 'avg_utilization_ratio'}.issubset(X.columns):
+                X['utilization_amont'] = (
+                    X['credit_limit'].astype('float64') *
+                    X['avg_utilization_ratio'].astype('float64')
+                ).astype('float32')
+            else:
+                X['utilization_amont'] = np.float32(0.0)
+
+
+            if {'credit_limit', 'total_revolving_bal'}.issubset(X.columns):
+                X['credit_revolving'] = (
+                    X['credit_limit'].astype('float64') -
+                    X['total_revolving_bal'].astype('float64')
+                ).astype('float32')
+            else:
+                X['credit_revolving'] = np.float32(0.0)
+
+            # =========================================================
+            # C. Binary Features / Flags
+            # =========================================================
+            for col in [
+                'months_inactive_12_mon',
+                'contacts_count_12_mon',
+                'dependent_count',
+                'total_revolving_bal',
+                'total_amt_chng_q4_q1',
+                'total_ct_chng_q4_q1',
+                'avg_utilization_ratio'
+            ]:
+                if col in X.columns:
+                    X[f'{col}_0'] = (X[col] == 0).astype('int8')
+                else:
+                    X[f'{col}_0'] = np.int8(0)
+
+            # low_activity_low_value_flag with bins learned in fit
+            def _quantile_index(series, bins):
+                if (series is None) or (bins is None):
+                    return None
+                return pd.cut(
+                    series,
+                    bins = bins,
+                    labels = False,
+                    include_lowest = True
+                )
+
+            util_q = _quantile_index(
+                X['avg_utilization_ratio'] if 'avg_utilization_ratio' in X.columns else None,
+                self.util_bins_
+            )
+            revol_q = _quantile_index(
+                X['total_revolving_bal'] if 'total_revolving_bal' in X.columns else None,
+                self.revol_bins_
+            )
+            amt_q = _quantile_index(
+                X['total_trans_amt'] if 'total_trans_amt' in X.columns else None,
+                self.amt_bins_
+            )
+            relation_q = _quantile_index(
+                X['total_relationship_count'] if 'total_relationship_count' in X.columns else None,
+                self.relation_bins_
+            )
+            trans_q = _quantile_index(
+                X['total_trans_ct'] if 'total_trans_ct' in X.columns else None,
+                self.trans_bins_
+            )
+
+            if all(q is not None for q in [util_q, revol_q, amt_q, relation_q, trans_q]):
+                X['low_activity_low_value_flag'] = (
+                    (util_q == util_q.min()) &
+                    (trans_q == trans_q.min()) &
+                    (amt_q == amt_q.min()) &
+                    (revol_q == revol_q.min()) &
+                    (relation_q == relation_q.min())
                 ).astype('int8')
             else:
-                X['young_low_tenure'] = np.int8(0)
+                X['low_activity_low_value_flag'] = np.int8(0)
 
-            if (
-                ('age' in X.columns) and
-                ('tenure' in X.columns) and
-                (self.age_q75_ is not None) and
-                (self.tenure_q75_ is not None)
-            ):
-                X['old_upper_tenure'] = (
-                    (X['age'] >= self.age_q75_) &
-                    (X['tenure'] >= self.tenure_q75_)
+            # is_pos_graduate
+            if 'education_level' in X.columns:
+                X['is_pos_graduate'] = (
+                    (X['education_level'] == 'Doctorate') |
+                    (X['education_level'] == 'Post-Graduate')
                 ).astype('int8')
             else:
-                X['old_upper_tenure'] = np.int8(0)
+                X['is_pos_graduate'] = np.int8(0)
 
-            # --------------------------
-            # 7) Risk feature
-            # --------------------------
-            existing_toxic = [c for c in self.toxic_cols if c in X.columns]
-            if existing_toxic:
-                X['toxic_score'] = X[existing_toxic].sum(axis=1).astype('int32')
+            # total_amt_q75 e total_ct_q75 
+            if 'total_amt_chng_q4_q1' in X.columns:
+                X['total_amt_q75'] = (X['total_amt_chng_q4_q1'] >= 0.75).astype('int8')
             else:
-                X['toxic_score'] = np.int32(0)
+                X['total_amt_q75'] = np.int8(0)
 
-            # --------------------------
-            # Final numeric cleanup
-            # --------------------------
-            num_cols = X.select_dtypes(include=[np.number]).columns
+            if 'total_ct_chng_q4_q1' in X.columns:
+                X['total_ct_q75'] = (X['total_ct_chng_q4_q1'] >= 0.75).astype('int8')
+            else:
+                X['total_ct_q75'] = np.int8(0)
+
+            # =========================================================
+            # D. Buckets / Ordinal Segmentation
+            # =========================================================
+            if 'total_trans_ct' in X.columns:
+                X['trans_ct_bucket'] = pd.cut(
+                    X['total_trans_ct'],
+                    bins = [0, 25, 50, 75, 100, np.inf],
+                    labels = [
+                        'very_low_activity',
+                        'low_activity',
+                        'medium_activity',
+                        'high_activity',
+                        'very_high_activity'
+                    ],
+                    include_lowest=True,
+                    ordered=True
+                )
+            else:
+                X['trans_ct_bucket'] = pd.Series(
+                    pd.Categorical(
+                        [np.nan] * len(X),
+                        categories = [
+                            'very_low_activity',
+                            'low_activity',
+                            'medium_activity',
+                            'high_activity',
+                            'very_high_activity'
+                        ],
+                        ordered = True
+                    ),
+                    index = X.index
+                )
+
+            if 'total_trans_amt' in X.columns:
+                X['trans_amt_bucket'] = pd.cut(
+                    X['total_trans_amt'],
+                    bins = [0, 2500, 5000, 7500, 10000, np.inf],
+                    labels = [
+                        'very_low_activity',
+                        'low_activity',
+                        'medium_activity',
+                        'high_activity',
+                        'very_high_activity'
+                    ],
+                    include_lowest = True,
+                    ordered = True
+                )
+            else:
+                X['trans_amt_bucket'] = pd.Series(
+                    pd.Categorical(
+                        [np.nan] * len(X),
+                        categories = [
+                            'very_low_activity',
+                            'low_activity',
+                            'medium_activity',
+                            'high_activity',
+                            'very_high_activity'
+                        ],
+                        ordered = True
+                    ),
+                    index = X.index
+                )
+
+            if 'months_on_book' in X.columns:
+                X['tenure_bucket'] = pd.cut(
+                    X['months_on_book'],
+                    bins=[0, 12, 24, 48, np.inf],
+                    labels=['new', 'developing', 'established', 'loyal'],
+                    include_lowest = True,
+                    ordered = True
+                )
+            else:
+                X['tenure_bucket'] = pd.Series(
+                    pd.Categorical(
+                        [np.nan] * len(X),
+                        categories = ['new', 'developing', 'established', 'loyal'],
+                        ordered = True
+                    ),
+                    index=X.index
+                )
+
+            # =========================================================
+            # Final cleaning of numeric values
+            # =========================================================
+            num_cols = X.select_dtypes(include = [np.number]).columns
             X[num_cols] = (
                 X[num_cols]
                 .replace([np.inf, -np.inf], np.nan)
@@ -339,8 +455,6 @@ class DtypeOptimizer(
 
     - continuous_cols -> float32
 
-    - binary_cols -> int8 (0/1)
-
     - integer_cols -> int32 (counts/years/months; includes 'ed' if you want to treat it as a numeric ordinal)
 
     - categorical_cols -> category (nominals, e.g., 'custcat')
@@ -363,14 +477,14 @@ class DtypeOptimizer(
     # ======================================================== #
     def __init__(
         self,
-        categorical_cols:list = ['custcat'],
-        integer_cols:list = ['tenure', 'age', 'address', 'employ', 'ed'],
-        binary_cols:list = [
-            'equip','callcard', 'wireless','ebill', 'voice', 'pager',
-            'internet', 'callwait', 'confer',
+        categorical_cols:list = [
+            'Gender', 'Education_Level', 'Marital_Status', 'Income_Category', 'Card_Category', 'Attrition_Flag'
+        ],
+        integer_cols:list = [
+            'Customer_Age', 'Dependent_count', 'Months_on_book', 'Total_Relationship_Count', 'Months_Inactive_12_mon','Contacts_Count_12_mon', 'Total_Trans_Ct',
         ],
         continuous_cols:list = [
-            'income',  'longmon', 'tollmon', 'equipmon', 'cardmon','wiremon',
+            'Credit_Limit', 'Total_Revolving_Bal','Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio'
         ],
     ):
         
@@ -393,7 +507,6 @@ class DtypeOptimizer(
 
         self.categorical_cols = categorical_cols
         self.integer_cols = integer_cols
-        self.binary_cols = binary_cols
         self.continuous_cols = continuous_cols
 
 
@@ -410,7 +523,7 @@ class DtypeOptimizer(
 
         Does not learn parameters; returns `self` to fulfill the scikit-learn contract
 
-        and allow `fit_transform()`. [web:2]
+        and allow `fit_transform()`
 
         Parameters
 
@@ -461,11 +574,6 @@ class DtypeOptimizer(
             if continuous:
                 X[continuous] = X[continuous].astype('float32')
 
-            # Binary
-            binary = [c for c in self.binary_cols if c in X.columns]
-            if binary:
-                X[binary] = X[binary].astype('int8')
-            
             # Integer
             integer = [c for c in self.integer_cols if c in X.columns]
             if integer:
@@ -475,6 +583,9 @@ class DtypeOptimizer(
             categorical = [c for c in self.categorical_cols if c in X.columns]
             if categorical:
                 X[categorical] = X[categorical].astype('category')
+            
+            # Adjusting column names to standard lowercase letters.
+            X = X.rename(columns = str.lower)
             
             return X
 
@@ -543,7 +654,10 @@ def classification_kfold_cv(
                 return_train_score = False,
                 n_jobs = n_jobs,
             )
-            est_full = clone(estimator).fit(X_train, y_train)
+            one_hot_cols = [
+                'gender', 'marital_status', 
+            ]
+            est_full = clone(estimator).fit(X_train, y_train,)
             train_scores = _get_scores(est_full, X_train, pos_label = pos_label)
             train_roc_auc = roc_auc_score(y_train, train_scores)
 
