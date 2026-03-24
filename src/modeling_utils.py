@@ -13,6 +13,30 @@ from sklearn.metrics import roc_auc_score
 from lightgbm import LGBMClassifier
 from sklearn.feature_selection import RFECV
 from sklearn.utils.validation import check_is_fitted
+#from __future__ import annotations
+import math
+from typing import Any, Hashable, Sequence
+import numpy.typing as npt
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.gridspec import GridSpec
+
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_curve,
+    roc_auc_score,
+    precision_recall_curve,
+    average_precision_score,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+    brier_score_loss,
+    classification_report
+)
+
 
 
 # ======================================================== #
@@ -869,3 +893,569 @@ class RecursiveFeatureEliminator(
         
         except Exception as e:
             print(f'[Error] Failure to execute fit function RecursiveFeatureEliminator: {str(e)}.')
+
+
+
+# ======================================================== #
+# Function models_performance_barplots                     #
+# ======================================================== #
+def models_performance_barplots(
+    data: pd.DataFrame,
+    models_col: str,
+    palette: Sequence[Any] | None = None,
+    title: str = 'Models Performance Comparison',
+    num_columns: int = 1,
+    figsize_per_row: float = 5
+):
+    """
+    Generate bar plots to compare the performance of multiple models across metrics.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        DataFrame containing one column with model identifiers and one or more
+        numeric metric columns.
+
+    models_col : str
+        Name of the column containing model identifiers.
+
+    palette : Sequence[Any] | None, default=None
+        Color palette used in the plots. If None, a viridis palette is created
+        automatically based on the number of unique models.
+
+    title : str, default='Models Performance Comparison'
+        Main title of the figure.
+
+    num_columns : int, default=1
+        Number of subplot columns.
+
+    figsize_per_row : float, default=5
+        Height of each subplot row in inches.
+
+    Returns
+    -------
+    NONE
+
+    Raises
+    ------
+    TypeError
+        If `data` is not a pandas DataFrame.
+
+    ValueError
+        If `models_col` is not present in `data`.
+
+    ValueError
+        If `num_columns` is less than 1.
+
+    ValueError
+        If no metric columns are found.
+
+    ValueError
+        If any metric column is not numeric.
+    """
+    if not isinstance(data, pd.DataFrame):
+        raise TypeError('data must be a pandas DataFrame.')
+
+    if models_col not in data.columns:
+        raise ValueError(f'Column \'{models_col}\' was not found in data.')
+
+    if num_columns < 1:
+        raise ValueError('num_columns must be greater than or equal to 1.')
+
+    metric_cols = [col for col in data.columns if col != models_col]
+
+    if not metric_cols:
+        raise ValueError('No metric columns were found to plot.')
+
+    non_numeric_cols = [
+        col for col in metric_cols
+        if not pd.api.types.is_numeric_dtype(data[col])
+    ]
+    if non_numeric_cols:
+        raise ValueError(
+            f'All metric columns must be numeric. Non-numeric columns found: {non_numeric_cols}'
+        )
+
+    n_models = data[models_col].nunique()
+    n_metrics = len(metric_cols)
+    num_rows = math.ceil(n_metrics / num_columns)
+
+    if palette is None:
+        palette = sns.color_palette('viridis', n_models)
+
+    fig_width = 15 * num_columns
+    fig_height = figsize_per_row * num_rows
+    fig, axes = plt.subplots(
+        num_rows,
+        num_columns,
+        figsize = (fig_width, fig_height),
+        squeeze = False
+    )
+    axes = axes.flatten()
+
+    for i, column in enumerate(metric_cols):
+        ax = axes[i]
+
+        barplot = sns.barplot(
+            data = data,
+            x = models_col,
+            y = column,
+            hue = models_col,
+            dodge = False,
+            edgecolor = 'black',
+            saturation = 1,
+            palette = palette,
+            ax = ax,
+            legend = False
+        )
+
+        ax.set_title(column, fontsize = 18, fontweight = 'bold')
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        ax.tick_params(axis = 'x', labelsize = 12, rotation = 0)
+        ax.tick_params(axis = 'y', labelsize = 11)
+        ax.grid(axis = 'y', linestyle = '--', alpha = 0.3)
+        ax.grid(axis = 'x', linestyle = '--', alpha = 0.3)
+        ax.set_yticklabels([])
+
+        for patch in barplot.patches:
+            height = patch.get_height()
+
+            if pd.isna(height):
+                continue
+
+            ax.annotate(
+                f'{height:.4f}',
+                (
+                    patch.get_x() + patch.get_width() / 2.0,
+                    height / 1.06 if height != 0 else height + 0.001
+                ),
+                ha = 'center',
+                va = 'top' if height > 0 else 'bottom',
+                fontsize = 12,
+                fontweight = 'bold',
+                color = 'white'
+            )
+
+    for j in range(n_metrics, len(axes)):
+        fig.delaxes(axes[j])
+
+    fig.suptitle(title, fontsize = 22, fontweight = 'bold', y = 1.02)
+    plt.tight_layout()
+    plt.show()
+
+
+# ======================================================== #
+# Function plot_kde_predictions                            #
+# ======================================================== #
+def plot_kde_predictions(
+    y_true: npt.ArrayLike,
+    y_score: npt.ArrayLike,
+    palette: Sequence[str] = ('#12e193', '#feb308'),
+    title: str = 'Prediction Probabilities',
+    n_bins: int = 10,
+    random_state: int = 33,
+    figsize: tuple[float, float] = (12, 8)
+) -> pd.DataFrame:
+    """
+    Plot:
+    1. KDE distribution of predicted probabilities by class.
+    2. Score ordering by quantile bin with observed event rate.
+
+    Parameters
+    ----------
+    y_true : npt.ArrayLike
+        Binary ground-truth labels.
+
+    y_score : npt.ArrayLike
+        Predicted probabilities or scores for the positive class.
+
+    palette : Sequence[str], default=('#12e193', '#feb308')
+        Colors used in the KDE plot by class.
+
+    title : str, default='Prediction Probabilities'
+        Title of the KDE plot.
+
+    n_bins : int, default=10
+        Number of quantile bins used to segment the scores.
+
+    random_state : int, default=33
+        Seed used to generate small random noise for tie breaking before `qcut`.
+
+    figsize : tuple[float, float], default=(12, 8)
+        Figure size in inches, given as (width, height).
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the bin index and observed event rate.
+
+    Raises
+    ------
+    ValueError
+        If `y_true` and `y_score` have different lengths.
+
+    ValueError
+        If the target is not binary.
+
+    ValueError
+        If no valid rows remain after cleaning.
+
+    RuntimeError
+        If any error occurs during plotting.
+    """
+    try:
+        y_true = np.asarray(y_true).ravel()
+        y_score = np.asarray(y_score).ravel()
+
+        if len(y_true) != len(y_score):
+            raise ValueError('y_true and y_score must have the same length.')
+
+        if len(np.unique(y_true)) != 2:
+            raise ValueError('This function only supports binary classification.')
+
+        plot_df = pd.DataFrame({
+            'y_true': y_true,
+            'y_score': y_score
+        }).dropna().copy()
+
+        if plot_df.empty:
+            raise ValueError('There are no valid rows after removing missing values.')
+
+        plot_df['y_true'] = pd.to_numeric(plot_df['y_true'], errors = 'coerce')
+        plot_df['y_score'] = pd.to_numeric(plot_df['y_score'], errors = 'coerce')
+        plot_df = plot_df.dropna().copy()
+
+        if plot_df.empty:
+            raise ValueError('The dataset became empty after numeric conversion.')
+
+        rng = np.random.default_rng(random_state)
+        noise = rng.uniform(0, 1e-4, size = len(plot_df))
+        plot_df['score_adj'] = plot_df['y_score'].to_numpy() + noise
+
+        plot_df = plot_df.sort_values(by = 'score_adj', ascending = True).reset_index(drop = True)
+
+        plot_df['decile'] = pd.qcut(
+            plot_df['score_adj'],
+            q = n_bins,
+            labels = False,
+            duplicates = 'drop'
+        )
+
+        decile_df = (
+            plot_df
+            .groupby('decile', observed = True)['y_true']
+            .mean()
+            .reset_index()
+            .rename(columns = {'y_true': 'event_rate'})
+        )
+
+        decile_df['decile'] = decile_df['decile'].astype(int) + 1
+
+        plt.rc('font', size = 10)
+        fig, axes = plt.subplots(
+            2, 1,
+            figsize = figsize,
+            gridspec_kw = {'height_ratios': [1.2, 1]}
+        )
+
+        ax_kde, ax_bar = axes
+
+        sns.kdeplot(
+            data = plot_df,
+            x = 'y_score',
+            hue = 'y_true',
+            fill = True,
+            alpha = 0.4,
+            bw_adjust = 1,
+            palette = palette,
+            linewidth = 1,
+            cut = 0,
+            ax = ax_kde
+        )
+
+        ax_kde.set_title(title, fontsize = 14, fontweight = 'bold')
+        ax_kde.set_xlabel('Predicted probability')
+        ax_kde.set_ylabel(None)
+        ax_kde.set_yticklabels([])
+        ax_kde.grid(axis = 'y', linestyle = '--', linewidth = 0.3)
+        ax_kde.grid(axis = 'x', linestyle = '--', linewidth = 0.3)
+        sns.despine(ax = ax_kde, top = True, right = True, left = True, bottom = False)
+
+        bars = ax_bar.bar(
+            decile_df['decile'],
+            decile_df['event_rate'],
+            color = 'darkorange',
+            edgecolor = 'white',
+            linewidth = 0.8
+        )
+
+        ax_bar.set_title(
+            'Probability scores ordering - Event rate per decile',
+            loc = 'left',
+            fontweight = 'bold',
+            fontsize = 13
+        )
+        ax_bar.set_xlabel('Decile', labelpad = 12)
+        ax_bar.set_ylabel(None)
+        ax_bar.set_xticks(decile_df['decile'])
+        ax_bar.tick_params(axis = 'both', which = 'both', length = 0)
+        ax_bar.yaxis.set_visible(False)
+
+        ax_bar.spines['top'].set_visible(False)
+        ax_bar.spines['right'].set_visible(False)
+        ax_bar.spines['left'].set_visible(False)
+        ax_bar.grid(False)
+
+        offset = max(decile_df['event_rate'].max() * 0.03, 0.005)
+
+        for bar, event_rate in zip(bars, decile_df['event_rate']):
+            height = bar.get_height()
+            ax_bar.text(
+                bar.get_x() + bar.get_width() / 2,
+                height + offset,
+                f'{event_rate * 100:.1f}%',
+                ha = 'center',
+                va = 'bottom',
+                color = 'black',
+                fontsize = 10,
+                fontweight = 'bold'
+            )
+
+        plt.tight_layout()
+        plt.show()
+
+        return decile_df
+
+    except Exception as e:
+        raise RuntimeError(
+            f'Failed to generate prediction probability graphs: {str(e)}.'
+        ) from e
+
+
+
+# ======================================================== #
+# Function evaluation_scores                               #
+# ======================================================== #
+def evaluation_scores(
+    y_true: npt.ArrayLike,
+    y_score: npt.ArrayLike,
+    X: pd.DataFrame | npt.ArrayLike | None = None,
+    pos_label: Hashable = 1,
+    threshold: float = 0.5,
+    figsize: tuple[float, float] = (6, 12),
+    title_prefix: str = ''
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Evaluate a binary classification model using true labels and predicted scores.
+
+    The function computes both threshold-based metrics and ranking-based metrics,
+    and generates three visualizations:
+    1. ROC curve
+    2. Precision-Recall curve
+    3. Confusion matrix
+
+    Parameters
+    ----------
+    y_true : npt.ArrayLike
+        Ground-truth target values.
+
+    y_score : npt.ArrayLike
+        Predicted scores for the positive class.
+        Ideally, predicted probabilities or monotonic model scores.
+
+    X : pd.DataFrame | npt.ArrayLike | None, default=None
+        Optional parameter kept for future compatibility.
+        It is currently not used in the function.
+
+    pos_label : Hashable, default=1
+        Label considered as the positive class.
+
+    threshold : float, default=0.5
+        Cutoff used to convert `y_score` into binary predictions.
+
+    figsize : tuple[float, float], default=(6, 12)
+        Figure size in inches, given as (width, height).
+
+    title_prefix : str, default=''
+        Prefix added to subplot titles.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, pd.DataFrame]
+        A tuple containing:
+        - report_df: Classification report by class and aggregate rows.
+        - metrics_df: Summary metrics DataFrame.
+
+    Raises
+    ------
+    ValueError
+        If `y_true` and `y_score` have different lengths.
+
+    ValueError
+        If the problem is not binary.
+
+    RuntimeError
+        If any failure occurs while computing metrics or generating the plots.
+
+    Notes
+    -----
+    - This function assumes binary classification.
+    - Brier score is most appropriate when `y_score` represents probabilities.
+    - The `X` parameter is currently unused.
+    """
+    try:
+        y_true = np.asarray(y_true).ravel()
+        y_score = np.asarray(y_score).ravel()
+
+        if len(y_true) != len(y_score):
+            raise ValueError('y_true and y_score need to be the same size.')
+
+        unique_labels = np.unique(y_true)
+        if len(unique_labels) != 2:
+            raise ValueError(
+                f'The function only supports binary classification. Labels found: {unique_labels}'
+            )
+
+        y_bin = (y_true == pos_label).astype(int)
+
+        fpr, tpr, _ = roc_curve(y_bin, y_score)
+        auroc_value = roc_auc_score(y_bin, y_score)
+
+        precision_vals, recall_vals, _ = precision_recall_curve(y_bin, y_score)
+        ap_value = average_precision_score(y_bin, y_score)
+
+        prevalence = y_bin.mean()
+
+        y_pred = (y_score >= threshold).astype(int)
+
+        cm = confusion_matrix(y_bin, y_pred)
+
+        accuracy = accuracy_score(y_bin, y_pred)
+        precision = precision_score(y_bin, y_pred, zero_division = 0)
+        recall = recall_score(y_bin, y_pred, zero_division = 0)
+        f1 = f1_score(y_bin, y_pred, zero_division = 0)
+
+        roc_auc = auroc_value
+        pr_auc = ap_value
+        brier = brier_score_loss(y_bin, y_score)
+        ks = np.max(tpr - fpr)
+        gini = 2 * roc_auc - 1
+
+        report_dict = classification_report(
+            y_bin,
+            y_pred,
+            output_dict = True,
+            zero_division = 0
+        )
+        report_df = pd.DataFrame(report_dict).T.reset_index()
+        report_df = report_df.rename(columns = {'index': 'class'})
+        report_df = report_df.round(4)
+
+        desired_order = ['0', '1', 'accuracy', 'macro avg', 'weighted avg']
+        report_df['order'] = report_df['class'].astype(str).apply(
+            lambda x: desired_order.index(x) if x in desired_order else 999
+        )
+
+        report_df = (
+            report_df
+            .sort_values('order')
+            .drop(columns = 'order')
+            .reset_index(drop = True)
+        )
+
+        metrics_df = pd.DataFrame({
+            'Metric': [
+                'Accuracy',
+                'Precision',
+                'Recall',
+                'F1-Score',
+                'ROC-AUC',
+                'KS',
+                'Gini',
+                'PR-AUC',
+                'Brier'
+            ],
+            'Value': [
+                accuracy,
+                precision,
+                recall,
+                f1,
+                roc_auc,
+                ks,
+                gini,
+                pr_auc,
+                brier
+            ]
+        })
+
+        metrics_df['Value'] = metrics_df['Value'].round(4)
+
+        fig = plt.figure(figsize = figsize)
+        gs = GridSpec(3, 1, figure = fig, height_ratios = [1, 1, 1.15])
+
+        ax_roc = fig.add_subplot(gs[0, 0])
+        ax_pr = fig.add_subplot(gs[1, 0])
+        ax_cm = fig.add_subplot(gs[2, 0])
+
+        ax_roc.plot(
+            fpr, tpr,
+            color = '#1f77b4',
+            lw = 2,
+            label = f'ROC (AUROC = {auroc_value:.3f})'
+        )
+        ax_roc.plot(
+            [0, 1], [0, 1],
+            color = 'gray',
+            linestyle = '--',
+            label = 'Random'
+        )
+        ax_roc.set_xlabel('False Positive Rate', fontsize = 12)
+        ax_roc.set_ylabel('True Positive Rate', fontsize = 12)
+        ax_roc.set_title(f'{title_prefix}ROC Curve', fontsize = 14, fontweight = 'bold')
+        ax_roc.legend(loc = 'lower right', fontsize = 10)
+        ax_roc.grid(True, linestyle = '--', linewidth = 0.5)
+
+        ax_pr.plot(
+            recall_vals, precision_vals,
+            color = 'darkorange',
+            lw = 2,
+            label = f'PR Curve (AP = {ap_value:.3f})'
+        )
+        ax_pr.axhline(
+            prevalence,
+            color = 'gray',
+            linestyle = '--',
+            label = f'Baseline = {prevalence:.3f}'
+        )
+        ax_pr.set_xlabel('Recall', fontsize = 12)
+        ax_pr.set_ylabel('Precision', fontsize = 12)
+        ax_pr.set_title(
+            f'{title_prefix}Precision-Recall Curve',
+            fontsize = 14,
+            fontweight = 'bold'
+        )
+        ax_pr.legend(loc = 'upper right', fontsize = 10)
+        ax_pr.grid(True, linestyle = '--', linewidth = 0.5)
+
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix = cm,
+            display_labels = [0, 1]
+        )
+        disp.plot(ax = ax_cm, cmap = 'viridis', colorbar = False)
+        ax_cm.grid(False)
+        ax_cm.set_title(
+            f'{title_prefix}Confusion Matrix (threshold = {threshold:.2f})',
+            fontsize = 14,
+            fontweight = 'bold'
+        )
+
+        plt.tight_layout()
+        plt.show()
+
+        return report_df, metrics_df
+
+    except Exception as e:
+        raise RuntimeError(
+            f'Failure to generate ROC curves, PR, confusion matrix and classification report: {e}'
+        ) from e
