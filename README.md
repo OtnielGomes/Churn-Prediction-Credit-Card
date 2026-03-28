@@ -192,68 +192,20 @@ This command is present in the first notebook of this project.
 ### 1 - Business Understanding  
 ---
 
-### General Problem Context  
-#### What is Churn Rate, and What Are the Solutions to This Problem? 
-Many companies struggle with customer churn and often find it challenging to reverse this trend. The metric that measures this scenario is called **churn rate**, which indicates when strategic solutions are needed to address the issue.  
+### Project Challenge
 
-In 2020, Bryce Baer published a guide on churn rate on the [Zendesk website](https://www.zendesk.com.br/blog/customer-churn-rate/?_ga=2.155312252.614584228.1623244699-1365810980.1622555740#) – a company specializing in corporate software development. The guide highlights that businesses implementing strategies to reduce churn can increase their **profitability** by nearly 40%.  
 
----
+The bank manager identified growth in the number of customers who are abandoning the credit card service.
 
-#### How to Calculate Churn Rate?
-##### Churn Rate Formula:  
-$$\text{Churn Rate} = \frac{\text{Number of customers lost during a period}}{\text{Total number of customers at the start of the period}} \times 100$$  
+Given this scenario, the main objective of the project will be to transform historical data into **actionable intelligence**, making it possible to understand the factors associated with churn and anticipate customer attrition risk.
 
----
+Stakeholders expect the proposed solution to be capable of:
 
-#### Impacts of a High Churn Rate
-While reducing churn to zero is practically impossible, acceptable rates (4% to 5%) minimize financial impacts. Some companies operate at higher rates (5% to 7%) without significant revenue loss, depending on industry dynamics. **Key factors to define "acceptable" churn**:  
-- Industry standards (e.g., SaaS vs. retail).  
-- Customer lifetime value (CLV).  
-- Customer acquisition cost (CAC).  
+1. **Analyzing historical data** to identify patterns and variables related to churn.
+2. **Developing a machine learning model** to estimate the probability of customer attrition.
+3. **Supporting strategic retention actions**, prioritizing customers with the highest cancellation propensity.
 
----
-
-#### Reasons for Customer Churn
-1. **Lack of Perceived Value**:  
-   - Occurs when there’s a growing gap between customer expectations and actual delivery. Clear communication about product/service benefits is critical.  
-2. **Poor Customer Experience**:  
-   - Negative interactions (e.g., bad support, complex processes, product failures) drive churn.  
-3. **Competitor Offers**:  
-   - Attractive promotions or pricing from competitors can lure customers away.  
-4. **Changing Customer Needs**:  
-   - Failure to adapt products/services to evolving demands leads to turnover.  
-
----
-
-## Project Challenge: 
-The bank’s manager has observed a rising number of customers abandoning credit card services. Stakeholders aim to:  
-1. **Analyze historical data** to identify root causes of churn.  
-2. **Develop a machine learning model** to predict customer churn probability.  
-3. **Implement strategic actions** to retain high-risk customers.  
-
----
-
-## KPIs for the Churn Prediction Project:  
-1. **Churn Rate**:  
-   - *Definition*: Percentage of customers who discontinue credit card services within a specific period.  
-   - *Goal*: Reduce this metric through targeted retention strategies.  
-
-2. **Retention Rate**:  
-   - *Definition*: Percentage of customers retained after a period.  
-   - *Importance*: Directly reflects the success of retention efforts.  
-
-3. **Customer Acquisition Cost (CAC) vs. Retention Cost**:  
-   - *Definition*: Ratio of costs to acquire new customers vs. retaining existing ones.  
-   - *Insight*: Retention is typically **5-7x cheaper** than acquisition.  
-
-4. **AUC-ROC (Area Under the Receiver Operating Characteristic Curve)**:  
-   - *Definition*: Measures the model’s ability to distinguish between churners and non-churners.  
-   - *Target*: AUC-ROC > 0.90.  
-
-5. **Recall**:  
-   - *Definition*: Proportion of actual churners correctly identified by the model.  
-   - *Importance*: High recall ensures fewer **false negatives** (missed churners), which is critical because a false negative could result in losing a customer. Retaining existing customers through targeted strategies is significantly cheaper than acquiring new ones.  
+> From a business perspective, the project aims to reduce customer losses, improve the efficiency of retention campaigns, and support data-driven decisions in the context of active customer relationship management.
 
 ---
 
