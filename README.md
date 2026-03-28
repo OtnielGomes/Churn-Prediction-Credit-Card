@@ -8,13 +8,11 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-<!-- PROJECT LOGO -->
-
 <br/>
 <div align="center">
     <img src="images/project_cover.png" alt="Logo" width="1000" height="650">
   
-  <h3 align="center"> Churn Analysis/Prediction </h3>
+  <h2 align="center"> Churn Prediction </h2>
 
   <p align="center">
     <h4>Customer churn classification of a credit card service with Pytorch as the main classification model.</h4>
