@@ -12,10 +12,10 @@
 <div align="center">
     <img src="images/project_cover.png" alt="Logo" width="1000" height="650">
   
-  <h2 align="center"> Churn Prediction </h2>
+  <h1 align="center"> Churn Prediction </h1>
 
   <p align="center">
-    <h4>Customer churn classification of a credit card service with Pytorch as the main classification model.</h4>
+    <h3>Customer churn classification of a credit card service with LGBM - Classifier as the main classification model.</h3>
     <br/>
     <a href="https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/tree/main/src"><strong>Explore the Docs and Functions »</strong></a>
     <br/><br/>
