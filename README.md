@@ -189,7 +189,7 @@ This command is present in the first notebook of this project.
 
 <br/>
 
-### 1 - Business Understanding  
+## 1 - Business Understanding  
 ---
 
 ### Project Challenge
@@ -213,26 +213,41 @@ Stakeholders expect the proposed solution to be capable of:
 
 <br/>
 
-### 2 - Data Understanding
+## 2 - Data Understanding
 
 ---
 
-* This dataset consists of 10,000 customers mentioning their age, salary, marital_status, credit card limit, credit card category, etc.
+### Dataset Overview
+This dataset contains information from 10,000 bank customers, including demographic, financial, and relationship-related attributes such as age, salary, marital status, credit card limit, and card category.
+
+> These variables provide the analytical foundation for investigating behavioral patterns associated with customer attrition and for supporting the construction of predictive models.
 
 ---
 
-- **Data file**: - BankChurners.csv
+### Data File
+- **Data file**: `BankChurners.csv`
 
 ---
 
-- **Target dependent variable**: - 'Attrition_Flag', categorical column with binary classification, i.e. 'Existing Customer'(No-churner) or 'Attrited Customer'(Churner).
+### Target Variable
+The dependent target variable is **`Attrition_Flag`**, a categorical feature with binary classes:
+
+1. **`Existing Customer`**
+- Represents customers who remained active, that is, non-churners.
+
+2. **`Attrited Customer`**
+- Represents customers who discontinued their relationship with the credit card service, that is, churners.
+
+> Since this is a **binary classification** problem, the target variable will be used to distinguish customers who remain in the base from those who are more likely to leave.
 
 ---
 
-- **The dataset colleted from kaggle**: https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers?sort=votes&select=BankChurners.csv
+### Data Source
+- **Dataset collected from Kaggle**:
+[https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers?sort=votes&select=BankChurners.csv](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers?sort=votes&select=BankChurners.csv)
 
----
-- **The dataset origin from this site**: https://leaps.analyttica.com/home
+- **Original dataset reference**:
+[https://leaps.analyttica.com/home](https://leaps.analyttica.com/home)
 
 ---
 
