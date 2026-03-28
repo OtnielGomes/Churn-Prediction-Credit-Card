@@ -72,25 +72,23 @@
 
 <br/>
 
-## Credit Card Churn Analysis - Prediction
----  
-
 ## Project Description 
 In this project, I will be working with a dataset provided by **Kaggle**, where I will develop a churn-rate analysis. The goal is to identify the causes and reasons for customer churn from a banking institution in relation to credit card services. After understanding these causes and reasons, some machine learning models will be developed to predict potential customers who will be abandoning the credit card service of this institution. With these predictions, I will seek to develop solutions to prevent or reverse the churn of these customers.  
 
----  
+---
 
-### CRISP-DM Methodology  
-The project will follow the CRISP-DM (*Cross-Industry Standard Process for Data Mining*) framework:  
+### CRISP-DM Methodology
+This project follows the CRISP-DM (*Cross-Industry Standard Process for Data Mining*) framework applied to **Customer Retention & Churn Prediction**:
+| **Stage** | **Objective** | **Methodological Execution** |
+| :--- | :--- | :--- |
+| **1. Business Understanding** | Mitigate revenue loss by identifying at-risk customers. | • **Target Definition**: Binary Classification (Churn: Yes/No).<br>• **KPIs**: Maximize **Lift** in retention campaigns & Revenue Saved vs. Cost. |
+| **2. Data Understanding** | Detect patterns of friction and dissatisfaction. | • **EDA**: Distribution analysis (Detect Imbalance).<br>• **Hypothesis Testing**: Correlation Matrix & Independence Tests (Chi-Square). |
+| **3. Data Preparation** | Construct a robust dataset for parametric modeling. | • **Scaling**: Standardization (Z-score) for coefficient comparability.<br>• **Encoding**: One-Hot Encoding for nominal variables.<br>• **Splitting**: Stratified Train/Test Split to preserve class ratio. |
+| **4. Modeling** | Estimate Churn Probability | • **Algorithms**: Logistic Regression, SVM LinearSVC, KNN, Random Florest, XGBoost, LightGBM.<br>• **Inference**: Analyze **Odds Ratios** to determine feature elasticity. |
+| **5. Evaluation** | Assess model reliability and financial impact. | • **Discrimination**: AUC-ROC & F1-Score & Recall.<br>• **Calibration**: Probability Calibration Curve (Reliability Diagram). |
+| **6. Deployment** | Integrate insights into the CRM lifecycle. | • **Deliverable**: "High-Risk" Customer List for Marketing Squad.<br>• **Artifact**: Serialize model (`joblib`) for batch inference. |
 
-| **Stage** | **Objective** | **Key Actions** |  
-|-----------|---------------|------------------|  
-| **1. Business Understanding** | Define the impact of churn prediction on customer retention. | - Identify the causes and possible solutions for the business.<br>- Align metrics with business KPIs. |  
-| **2. Data Understanding** | Analyze data structure, quality, and variable relationships. | - Exploratory Data Analysis (EDA).<br>- Outlier and correlation detection. |  
-| **3. Data Preparation** | Prepare data for model training. | - Split training and test data.<br>- Remove redundant variables. |  
-| **4. Modeling** | Train and compare classical models and neural networks. | - Random Forest/Logistic Regression (baseline).<br>- PyTorch neural network (focus on generalization). |  
-| **5. Evaluation** | Validate performance with business-oriented metrics. | - AUC-ROC, Recall, confusion matrix.<br>- Simulate financial impact. |  
-| **6. Deployment** | Deploy the model for production use. | - Build a final churn prediction model with customer behavior indicators. |  
+---
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -107,22 +105,19 @@ The project will follow the CRISP-DM (*Cross-Industry Standard Process for Data 
 - [![NP][NumPy]][NumPy-url]
 - [![Matplot][Matplotlib]][Matplotlib-url]
 - [![Scipy][Scipy]][Scipy-url]
-- [![Torch][PyTorch]][PyTorch-url]
 - [![Sklearn][scikit-learn]][scikit-learn-url]
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-
-<!-- GETTING STARTED -->
 ## Getting Started
 
 <br/>
 
 **Clone the repository**
 ```sh
-git clone https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch
+git clone https://github.com/OtnielGomes/Churn-Prediction-Credit-Card
 ```
 <br/>
 
@@ -187,7 +182,6 @@ This command is present in the first notebook of this project.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- USAGE EXAMPLES -->
 
 <br/>
 
@@ -1072,8 +1066,6 @@ Distributed under the MIT License. See [`LICENSE.txt`](https://github.com/Otniel
 [Azure Databricks]: https://img.shields.io/badge/Databricks-FF3621?style=for-the-badge&logo=Databricks&logoColor=white
 [Azure Databricks-url]:  https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account?icid=databricks
 
-[PyTorch]: https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white
-[PyTorch-url]: https://pytorch.org
 
 [scikit-learn]: https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white
 [scikit-learn-url]: https://scikit-learn.org/stable/
