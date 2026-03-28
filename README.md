@@ -1,6 +1,5 @@
 <a id="readme-top"></a>
 
-<!-- PROJECT SHIELDS -->
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -13,20 +12,20 @@
 
 <br/>
 <div align="center">
-    <img src="images/logo.jpg" alt="Logo" width="650" height="400">
+    <img src="images/project_cover.png" alt="Logo" width="1000" height="650">
   
   <h3 align="center"> Churn Analysis/Prediction </h3>
 
   <p align="center">
     <h4>Customer churn classification of a credit card service with Pytorch as the main classification model.</h4>
     <br/>
-    <a href="https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/tree/main/src"><strong>Explore the Docs and Functions »</strong></a>
+    <a href="https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/tree/main/src"><strong>Explore the Docs and Functions »</strong></a>
     <br/><br/>
-    <a href="https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/tree/main/notebooks">View Notebooks</a>
+    <a href="https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/tree/main/notebooks">View Notebooks</a>
     ·
-    <a href="https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -1054,20 +1053,20 @@ Distributed under the MIT License. See [`LICENSE.txt`](https://github.com/Otniel
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch.svg?style=for-the-badge
-[contributors-url]: https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/graphs/contributors
+[contributors-shield]: https://img.shields.io/github/contributors/OtnielGomes/Churn-Prediction-Credit-Card.svg?style=for-the-badge
+[contributors-url]: https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/graphs/contributors
 
-[forks-shield]: https://img.shields.io/github/forks/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch.svg?style=for-the-badge
-[forks-url]: https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/network/members
+[forks-shield]: https://img.shields.io/github/forks/OtnielGomes/Churn-Prediction-Credit-Card.svg?style=for-the-badge
+[forks-url]: https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/network/members
 
-[stars-shield]: https://img.shields.io/github/stars/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch.svg?style=for-the-badge
-[stars-url]: https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/stargazers
+[stars-shield]: https://img.shields.io/github/stars/OtnielGomes/Churn-Prediction-Credit-Card.svg?style=for-the-badge
+[stars-url]: https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/stargazers
 
-[issues-shield]: https://img.shields.io/github/issues/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch.svg?style=for-the-badge
-[issues-url]: https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/issues
+[issues-shield]: https://img.shields.io/github/issues/OtnielGomes/Churn-Prediction-Credit-Card.svg?style=for-the-badge
+[issues-url]: https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/issues
 
-[license-shield]: https://img.shields.io/github/license/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch.svg?style=for-the-badge
-[license-url]: https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/blob/main/LICENSE
+[license-shield]: https://img.shields.io/github/license/OtnielGomes/Churn-Prediction-Credit-Card.svg?style=for-the-badge
+[license-url]: https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/blob/main/LICENSE
 
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/otnielgomes
