@@ -380,319 +380,72 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 
 
-### 3 - Data Preparation
+## 3 - Data Preparation
 ---
 
+- For the data preparation stage, **two distinct pipelines** were developed: one designed for **linear models** and the other for **tree-based models**.
 
-- In this step, I will initially divide the training and testing data so that the testing data does not interfere in the analyses, so that the model does not have any bias from the testing data, and only with the training data is it capable of generating good classifications with good generalization.
----
-- Next, an EDA will be conducted to verify the data and its main characteristics. In this EDA, the main objective will be to understand the relationship of the data with the churn rate of this banking institution.
----
-### Exploratory Data Analysis - EDA
 
-The **Exploratory Data Analysis (EDA)** for this project will be carried out in three main stages: **Univariate Analysis**, **Bivariate Analysis**, and **Multivariate Analysis**.  
-The goal is to explore and understand the patterns within the dataset, identifying relationships, trends, and potential insights that can guide the development of effective solutions.
+> This separation was adopted because each family of algorithms has its own preprocessing requirements, especially with regard to **scaling numerical variables** and **encoding categorical variables**.
 
----
 
-#### Univariate Analysis  
-- **What it is:** Examines **one variable at a time**, without considering its relationship to others.  
-- **Purpose:** Understand the distribution, central tendency, and dispersion of the variable, as well as detect possible outliers.  
+- As discussed in the EDA, the initial decision was to remove only the variables **`equip`** and **`wireless`**, since they showed high correlation with **`equipmon`** and **`wiremon`**, respectively.
 
----
 
-#### Bivariate Analysis  
-- **What it is:** Studies **the relationship between two variables**.  
-- **Purpose:** Identify correlations, patterns, or dependencies, and assess how one variable may influence the other.  
+- The other highly correlated variables were deliberately retained at this initial stage.
 
----
 
-#### Multivariate Analysis  
-- **What it is:** Investigates **three or more variables simultaneously**.  
-- **Purpose:** Understand complex interactions and multidimensional patterns, identifying combinations of factors that influence the observed behavior.  
+> This decision allows the modeling process to empirically evaluate how different algorithms handle **multicollinearity**, **informational redundancy**, and the possible **marginal predictive gain** associated with these variables.
+
+
+- In both pipelines, the data preparation flow followed the same general structure:
+
+
+- **Variable type optimization**, with the objective of ensuring structural consistency, reducing memory usage, and adapting the data to the computational requirements of the algorithms.
+
+- **Feature engineering**, with the creation of new derived variables based on findings from the exploratory analysis and domain knowledge.
+
+- **Model-family-specific preprocessing**, respecting the technical particularities of each modeling approach and ensuring compatibility between the transformed data and the algorithms used.
 
 ---
 
-### Univariate Analysis 
-
-<br/><br/>
-<div align="center">
-    <img src="images/churn_rate_uni.png" alt="Churn Rate train data" width="600" height="400">
-  </a>
-</div>
-<br/>
-
-- This dataset has imbalanced classes, which can be a factor to be considered when training machine learning models. Datasets with imbalanced classes make it more difficult to train and generalize model classifications, especially for **minority** classes. In general, models tend to learn more easily to predict the **majority class**, while they have more difficulty in detecting **minority classes**.
----
-
-<br/><br/>
-<div align="left">
-    <img src="images/histogram_numerical_uni.png" alt="Histogram Numerical" width="800" height="900">
-  </a>
-</div>
-<br/>
-
-#### Observations and insights regarding numerical data
----
-- 1 - The **age of customers** is more widely distributed between the **40** and **50 age groups**, with **49** being the most frequent age group in these data.
----
-- 2 - Most customers have between **2** and **3 dependents**, with a minority having 5 dependents.
----
-- 3 - The length of the **customer's relationship** with the bank varies from **13** to **56 months**, with **36 months** being the most frequent.
----
-- 4 - The **number of products** maintained by the customer is generally above **3 products**, with few customers maintaining only **1** or **2 products**.
----
-- 5 - Most **customers remain inactive** for a maximum of **3 months**, with only a small fraction remaining inactive for **4** to **6 months**.
----
-- 6 - The **number of contacts** in the last 12 months was, in most cases, **2** to **3 contacts**.
----
-- 7 - The **number of transactions** is mostly distributed between **60** and **80 transactions**, with a very small portion of customers making less than **20** or more than **100 transactions**.
----
-- 8 - Most customers have a **credit limit** of less than **5,000 dollars**, although there is a relatively significant portion of customers with a limit of **35,000 dollars**.
----
-- 9 -Most customers have a **zero credit card revolving balance**, which is relatively positive, indicating that most customers are up to date with their bill payments.
----
-- 10 - The **average open to buy**  is below **5,000 dollars**.
----
-- 11 - Most credit **card limit utilization** is below **20%**, with a small portion of customers using more than **80%** of their credit card limit.
----
-
-<br/><br/>
-<div align="left">
-    <img src="images/countplot_categorical_uni.png" alt="Countplot Categorical" width="800" height="700">
-  </a>
-</div>
-<br/>
-
-#### Observations and insights regarding categorical data
----
-
-- 1 - The majority of clients are women, with a percentage of **52.5%**.
----
-- 2 - **46.1%** of clients are **married**, while **39.3%** are **single**. There is a small portion of **7.4%** of **divorced** clients and another portion of **7.2%** of clients who do **not fit** into any of the above categories.
----
-- 3 - The majority of clients have a **Graduate** level of education, with **31%**. This status refers to people who have already graduated and completed a specialization in the area they studied.
-
-  **High School** represents **20.1%**. This status refers to people who have already graduated and completed high school.
-
-  **Unknown** represents **14.7%**. This status refers to people who possibly did not fill out the form or did not fit into any of the above classifications.
-
-  **Uneducated** represents **14.6%**. This status refers to people who have not had access to formal education or have not completed a significant level of study.
-
-  **College** represents **9.9%**. This status refers to higher education.
-
-  Finally, the **Postgraduate** and **Doctorate** statuses have the smallest shares. **Postgraduate** is basically a synonym for **Graduate**, both referring to the same status, while **Doctorate** refers to the highest level of study.
----
-- 4 - The majority of clients, **34.9%**, have an income below **40k**.
-
-  **17.7%** of clients have an income between **40k and 60k**.
-
-  **14%** have an income between **60k and 80k**.
-
-  **15.3%** have an income between **80k and 120k**.
-
-  **10.9%** did not fill out this information or do not fit into any of the categories above.
-
-  A smaller portion, **7.3%**, has an income above **120k** per year.
----
-- 5 - **93.1%** of customers have a **Blue** credit card, which is the dominant class. Next comes the **Silver** credit card with **5.6%**, and the **Gold** and **Platinum** cards with a small share of participation that is practically nil.
----
-
-### Bivariate Analysis 
-
-<br/><br/>
-<div align="center">
-    <img src="images/correlation_heatmap_bi.png" alt="Correlation Heatmap" width="800" height="800">
-  </a>
-</div>
-<br/>
-
----
-
-<br/><br/>
-<div align="center">
-    <img src="images/histogram_numerical_bi.png" alt="Histogram Numerical" width="800" height="900">
-  </a>
-</div>
-<br/>
-
----
-
-<br/><br/>
-<div align="center">
-    <img src="images/boxplot_numerical_bi.png" alt="Boxplot Numerical" width="800" height="900">
-  </a>
-</div>
-<br/>
-
----
-
-<br/><br/>
-<div align="center">
-    <img src="images/barplot_numerical_bi.png" alt="Barplot Numerical" width="800" height="900">
-  </a>
-</div>
-<br/>
-
-#### Observations and insights into the of numeric variables with the 'churn_target' variable.
----
-- 1 - In the variable **total_revolving_bal**, it is possible to observe that a greater distribution of customers who stopped using their credit card is in the **lowest revolving balance values**. A significant portion of these customers have a revolving balance **below \$500**.
----
-- 2 - In the variable **total_trans_amt**, it is possible to observe that customers who stopped using their credit card have a greater distribution in the **lower transfer values**. Most of these customers made a total of **transfers below \$2750**.
----
-- 3 - In the variable **total_ct_chng_q4_q1**, it is possible to observe that most customers who kept their credit card service active had an increase of at least **50%** in the number of transactions carried out in relation to Q4 and Q1.
----
-- 4 - In the **avg_utilization_ratio** variable, it is possible to observe that most customers who stopped using their credit card have practically **not used their credit card limit** in the last few months.
----
-- 5 - In the **contacts_count_12_mon** variable, it is possible to observe that most customers who stopped using their credit card have a **number of contacts greater than or equal to 3**.
----
-- 6 - In the **total_trans_ct** variable, it is possible to observe that most customers who stopped using the credit card have a number **below 80 transactions in the last 12 months**. And all customers who have **95 transactions or more** continued to use the credit card.
----
-- 7 - The value of the revolving balances of customers who stopped using their credit cards is relatively lower, around **45% less**, than that of customers who continued using their credit cards.
----
-- 8 - The total transfer values ​​in recent months are lower for customers who stopped using their credit cards.
----
-- 9 - Customers who continued using their credit cards have a reasonably higher number of services.
----
-- 10 - Customers who stopped using their credit cards have a higher number of inactive months and a higher number of contacts in the last 12 months.
----
-- 11 - Customers who stopped using their credit cards had about **34% fewer transactions** compared to customers who continued using their credit card service in the last 12 months.
----
-
-<br/><br/>
-<div align="center">
-    <img src="images/countplot_categorical_bi.png" alt="Countplot Categorical" width="800" height="700">
-  </a>
-</div>
-<br/>
-
----
-
-<br/><br/>
-<div align="center">
-    <img src="images/countplot_categoricalvscolumnclass_bi.png" alt="Countplot Categorical vs Column Class" width="800" height="700">
-  </a>
-</div>
-<br/>
-
-#### Observations and insights on categorical variables with the 'churn_target' variable
----
-- 1 - The **level of education** does not demonstrate a very strong relationship with the rate of customers who stopped using credit card services. Considering that this variable is classified according to the levels of education, it was expected that the higher or lower the level of education, the more likely these customers would choose to continue using the credit card service.
-
-- However, it is possible to draw some observations regarding this data, as it directly affects the institution's possible decision-making.
-- The level of education with the highest churn rate is the **Doctorate**, with around **22.9%**. The lowest rates are the **Graduate** levels, with **15%**, and **High School**, with **15.1%** of churn rate.
----
-- 2 - **Customers' annual income** does not have a significant influence on the rate of customers who stopped using their credit cards, as all salary ranges follow a practically similar distribution in relation to the churn rate index. Only customers with a salary range of **60k - 80k** had a churn rate of **13.3%**, which is slightly lower compared to the other salary ranges.
----
-- 3 - The **credit card category** shows a significant relationship with the rate of customers who stopped using their credit cards. The **Gold** and **Platinum** categories had a higher-than-average rate of credit card service cancellations compared to the other categories. However, these two categories represent a very small percentage of this data set; together, they do not even have a **2%** share in relation to the other categories.
----
-- 4 - The **Silver** category is the category with the lowest rate of credit card service cancellations **with a 14.1% churn rate**.
----
-- 5 - Considering the data from this banking institution, it is possible to conclude that the rate of customers with the **Silver**, **Gold** and **Platinum** card brands is very low. We have **93%** of customers with the initial brand, which is the basic **Azul** card. It would be of great value for this institution to invest in a more flexible policy in its card categories. Offering more benefits to its customers and differentiated services through the **Silver**, **Gold** and **Platinum** brands can increase the loyalty rate of its customers.
----
-- 6 - The **gender** of customers declared to have a specific relationship with the churn rate. Women reported having a higher rate of cancellation of the card service than men.
----
-- 7 - The **relationship status** is graphically revealed to have a specific relationship with the churn rate indexes. **Married customers** have a **slightly lower** churn rate index than **single customers**.
----
-- 8 - Initially considering the statistical data and graphs of these categorical variables, it is possible to conclude that they do not have a satisfactory relevance in solving the problem of this institution, which would be the turnover rate. However, we have some variables that somehow present some differences in their classes regarding the churn rate index, which directly affect these variables is the distorted distribution of these variables such as **marital_status and card_category**.
-
----
-
-### Multivariate Analysis 
-
-<br/><br/>
-<div align="center">
-    <img src="images/scaterplot_multi.png" alt="Scaterplot Multivars" width="800" height="800">
-  </a>
-</div>
-<br/>
-
-#### Observations and insights into the of numeric variables x  total_trans_ct with the 'churn_target' variable.
----
-- 1 - The variable **total_trans_ct** has a very strong correlation with the variable **churn_target**. Therefore, I chose to check its dispersion with the other variables, grouped by the target variable **churn_target**.
-
-The combinations that best defined a good separation between **Non_churners** and **Churners** customers were:
-
-- **total_trans_ct** x **total_trans_amt**
-- **total_trans_ct** x **total_ct_chng_q4_q1**
-- **total_trans_ct** x **total_ct_chng_q4_q1**
-
-These variables refer to the quantity or total value of transactions, reinforcing the previous observations that the number of transactions and their total value reflect, in a certain way, the possible behavior of the customer, indicating whether he or she will continue to use the credit card or stop using it.
-
----
-- 2 - The variables **total_revolving_bal** and **avg_utilization_ratio**, together with the variable **total_trans_ct**, had a reasonable separation of the **Churn** and **Non-churn** classes, although there was a greater dispersion in the graphs of these two variables.
-
----
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <br/>
 
-### 4 - Modeling
----  
-In this stage, **I will test classical machine learning models** to evaluate their performance on the training data. The approach will be **intentionally simple** (without complex hyperparameter tuning or advanced preprocessing techniques), as algorithms like **Random Forest, Logistic Regression, and SVM** typically perform better with straightforward data transformations.  
-
----  
-
-After this initial analysis, **I will prioritize the project’s main model**: a **neural network developed in PyTorch**. This architecture was chosen due to its:  
-
-- **Ability to identify complex patterns** in non-linear data.  
-- **Flexibility to adapt to class imbalances** (e.g., the observed 84%-16% class distribution).  
-- **Generalization capability** (Highly efficient with unseen data).  
-
-However, neural networks require **specific preprocessing**, particularly to address:  
-1. **High-cardinality categorical variables** (e.g., unique identifiers).  
-2. **Asymmetric distributions** (identified during the EDA phase).  
-3. **Data noise** (such as outliers in numerical variables).  
-
-To address these, I will apply:  
-- **Embedding layers** for categorical variables.  
-- **Cross-validation** to verify and adjust data across different partitions.  
-- **Regularization techniques** (e.g., *dropout*) to prevent *overfitting*.  
-
----  
-
-### Modeling Split into Two Phases 
-#### **Phase 1: Classical Machine Learning Models**  
-| **Objective** | **Tools** | **Metric** |  
-|---------------|------------|-------------|  
-| Establish a performance baseline for future comparison. | Scikit-learn (Decision Trees, SVM, Logistic Regression). | AUC-ROC. |  
-
-#### **Phase 2: PyTorch Neural Network**  
-| **Objective** | **Tools** | **Metric** |  
-|---------------|------------|-------------|  
-| Achieve better generalization on unseen data. | PyTorch, Torchmetrics, Ray Tune. | AUC-ROC, Recall. |  
-
----  
-
-### Evaluation Metric Choice: AUC-ROC 
-#### Why AUC-ROC?  
-| **Criterion** | **Explanation** | **Business Impact** |  
-|---------------|------------------|----------------------|  
-| **Class imbalance** | Balances *recall* (capturing churning customers) and *specificity* (avoiding unnecessary actions on loyal customers). | Reduces operational costs by prioritizing high-risk customers. |  
-| **Asymmetric cost sensitivity** | False negatives (missing churn) are more critical than false positives. | Improves retention campaign efficacy (e.g., personalized offers). |  
-| **Universal interpretability** | Scores above **0.85** indicate strong predictive power for binary classification. | Simplifies communication with non-technical stakeholders. |  
-
+## 4 - Modeling
 ---
 
-### Training Classics Models - Cross-Validation
+### Model Evaluation and Selection Strategy
+---
 
-#### Data Preprocessing for Traditional ML Models  
+- The primary metric defined for this project will be **AUC-ROC**.
 
-Traditional ML algorithms benefit from features that share similar scales and distributions, ensuring stable convergence and fair weighting across predictors. For this, I adopted the following strategy:  
 
-#### 1. Numerical Variables  
+> Since the problem involves **imbalanced classes** and the central objective is to develop a model capable of estimating the **probability of churn**, AUC-ROC is appropriate because it provides a comprehensive view of the model's discriminative ability between the two classes.
 
-| **Technique**       | **Applied Variables**                                                                                                                                                                                                                             | **Justification**                                                                                     |
-|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| **StandardScaler**  | All numeric features (`credit_limit`, `total_amt_chng_q4_q1`, `total_ct_chng_q4_q1`, `avg_utilization_ratio`, `customer_age`, `dependent_count`, `months_on_book`, `total_relationship_count`, `months_inactive_12_mon`, `contacts_count_12_mon`, `total_revolving_bal`, `total_trans_amt`, `total_trans_ct`) | Removes the mean and scales to unit variance, aligning feature ranges and mitigating outlier influence. |
 
-#### 2. Categorical Variables  
+- As secondary metrics, **F1-score** and **recall for the churn class** will also be monitored.
 
-| **Technique**      | **Applied Variables**                                                    | **Justification**                                                                                   |
-|--------------------|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| **OrdinalEncoder** | Ordinal features (`education_level`, `income_category`, `card_category`)   | Preserves inherent ordering without inflating dimensionality.                                       |
-| **OneHotEncoder**  | Nominal features (`gender`, `marital_status`)                             | Encodes each category distinctly, avoiding implied ranking and maintaining model interpretability. |
+
+> The **F1-score** will be used to evaluate the balance between **precision** and **recall**, while **recall for the churn class** will receive special attention, since correctly identifying customers at higher risk of churn is essential for guiding retention actions.
+
+
+> This choice is strategically relevant, since **retaining a customer** through engagement and loyalty campaigns is approximately **five times less costly** than **acquiring a new customer**.
+
+- Initial training will be conducted using **cross-validation**, with the objective of increasing the robustness of model evaluation at this stage of the project.
+
+
+> **5 folds** will be used, and the selection of the best model will consider not only the **highest mean AUC-ROC**, but also the **lowest variability** among the results observed across the different folds, seeking consistent performance and greater generalization capability.
+
+- Simpler models, such as **Logistic Regression** and **Decision Tree Classifier**, will be tested.
+
+- And more robust models, such as **Linear SVC** and **LightGBM**, will also be evaluated.
+
+> The objective of this comparison is to verify whether the structure of the data benefits from algorithms with **greater modeling capacity**, making it possible to assess potential performance gains in relation to simpler approaches.
+
+
 ---
 
 ### Applying Cross Validation
