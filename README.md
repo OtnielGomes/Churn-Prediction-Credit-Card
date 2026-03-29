@@ -473,7 +473,32 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 ---
 <br/>
 <div align="center">
-    <img src="images/probabilities.png" alt="Scores Models" width="900" height="900">
+    <img src="images/probabilities.png" alt="Probabilities" width="900" height="900">
+  </a>
+</div>
+<br/>
+
+## SHAP - Analysis
+---
+<br/>
+<div align="center">
+    <img src="images/customer_inter.png" alt="customer inter" width="900" height="750">
+  </a>
+</div>
+<br/>
+
+---
+<br/>
+<div align="center">
+    <img src="images/shap_val.png" alt="shap values" width="900" height="750">
+  </a>
+</div>
+<br/>
+
+---
+<br/>
+<div align="center">
+    <img src="images/shap_val_1.png" alt="shap  values 1" width="900" height="750">
   </a>
 </div>
 <br/>
