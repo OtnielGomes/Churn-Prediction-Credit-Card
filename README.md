@@ -252,24 +252,23 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 [https://leaps.analyttica.com/home](https://leaps.analyttica.com/home)
 
 ---
-### Exploratory Data Analysis (EDA):
+## Exploratory Data Analysis (EDA):
 ---
 
 > The EDA will be conducted in three main stages: univariate, bivariate, and multivariate analysis.
 
-##### Univariate analysis
+### Univariate analysis
 ---
 
 > Evaluates one variable at a time, focusing on distribution, central tendency, dispersion, and outlier detection.
----
 
-##### Bivariate analysis
+### Bivariate analysis
 ---
 
 > Investigates the relationship between two variables, allowing the analysis of correlation, association, or differences between groups.
 ---
 
-##### Multivariate analysis
+### Multivariate analysis
 ---
 
 > Examines three or more variables simultaneously in order to identify more complex patterns, interactions, and joint behavior.
