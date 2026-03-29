@@ -258,20 +258,17 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 > The EDA will be conducted in three main stages: univariate, bivariate, and multivariate analysis.
 
 ### Univariate analysis
+
+> **Evaluates one variable at a time, focusing on distribution, central tendency, dispersion, and outlier detection.**
+
 ---
-
-> Evaluates one variable at a time, focusing on distribution, central tendency, dispersion, and outlier detection.
-
 ### Bivariate analysis
----
 
-> Investigates the relationship between two variables, allowing the analysis of correlation, association, or differences between groups.
+> **Investigates the relationship between two variables, allowing the analysis of correlation, association, or differences between groups.**
 ---
-
 ### Multivariate analysis
----
 
-> Examines three or more variables simultaneously in order to identify more complex patterns, interactions, and joint behavior.
+> **Examines three or more variables simultaneously in order to identify more complex patterns, interactions, and joint behavior.**
 ---
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
