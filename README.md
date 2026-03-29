@@ -277,7 +277,7 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 <br/><br/>
 <div align="center">
-    <img src="images/hist_uni" alt="Histogram Univariate" width="1000" height="700">
+    <img src="images/hist_uni.png" alt="Histogram Univariate" width="1000" height="750">
   </a>
 </div>
 <br/>
@@ -286,7 +286,7 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 <br/><br/>
 <div align="center">
-    <img src="images/box_uni" alt="Box Plot Univariate" width="1000" height="700">
+    <img src="images/box_uni.png" alt="Box Plot Univariate" width="1000" height="750">
   </a>
 </div>
 <br/>
@@ -294,6 +294,20 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <br/>
+
+---
+
+<br/><br/>
+<div align="center">
+    <img src="images/count_uni.png" alt="Count Plot Univariate" width="1000" height="750">
+  </a>
+</div>
+<br/>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<br/>
+
 
 ### 3 - Data Preparation
 ---
