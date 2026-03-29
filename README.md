@@ -270,6 +270,17 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 > **Examines three or more variables simultaneously in order to identify more complex patterns, interactions, and joint behavior.**
 ---
+<br/>
+
+## Univariate Analysis:
+---
+
+<br/><br/>
+<div align="center">
+    <img src="images/hist_uni" alt="Histogram Univariate" width="500" height="600">
+  </a>
+</div>
+<br/>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
