@@ -336,12 +336,33 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 </div>
 <br/>
 
+---
+<br/><br/>
+<div align="center">
+    <img src="images/count_bi.png" alt="Count Plot Bivariate width="1000" height="750">
+  </a>
+</div>
+<br/>
+
+---
+### Statistical Tests
+
+---
+<br/><br/>
+<div align="center">
+    <img src="images/num_test.png" alt="Numerical Test Bivariate width="700" height="550">
+  </a>
+</div>
+<br/>
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <br/>
 
 ### 3 - Data Preparation
 ---
+
 
 - In this step, I will initially divide the training and testing data so that the testing data does not interfere in the analyses, so that the model does not have any bias from the testing data, and only with the training data is it capable of generating good classifications with good generalization.
 ---
