@@ -244,19 +244,35 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 ### Data Source
 - **Dataset collected from Kaggle**:
+
 [https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers?sort=votes&select=BankChurners.csv](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers?sort=votes&select=BankChurners.csv)
 
 - **Original dataset reference**:
+
 [https://leaps.analyttica.com/home](https://leaps.analyttica.com/home)
 
 ---
+### Exploratory Data Analysis (EDA):
+---
 
-<br/>
-<div align="center">
-    <img src="images/type_variables.png" alt="Type Variables" width="700" height="500">
-  </a>
-</div>
+> The EDA will be conducted in three main stages: univariate, bivariate, and multivariate analysis.
 
+##### Univariate analysis
+---
+
+> Evaluates one variable at a time, focusing on distribution, central tendency, dispersion, and outlier detection.
+---
+
+##### Bivariate analysis
+---
+
+> Investigates the relationship between two variables, allowing the analysis of correlation, association, or differences between groups.
+---
+
+##### Multivariate analysis
+---
+
+> Examines three or more variables simultaneously in order to identify more complex patterns, interactions, and joint behavior.
 ---
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
