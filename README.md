@@ -277,7 +277,7 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 <br/><br/>
 <div align="center">
-    <img src="images/hist_uni" alt="Histogram Univariate" width="500" height="600">
+    <img src="images/hist_uni" alt="Histogram Univariate" width="1000" height="600">
   </a>
 </div>
 <br/>
