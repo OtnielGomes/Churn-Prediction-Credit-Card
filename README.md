@@ -613,7 +613,7 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 ## Roadmap
 
-- [Notebook-1-EDA](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/notebooks/0_EDA.ipynb)
+- [Notebook-1-EDA](notebooks/0_EDA)
 - [Notebook-2-Modeling](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/notebooks/1_Modeling.ipynb)
 
 
