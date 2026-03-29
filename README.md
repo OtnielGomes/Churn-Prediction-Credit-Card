@@ -594,14 +594,14 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 <br/>
 <div align="center">
-    <img src="images/deploy.png" alt="Deploy Non-Churn Demo" width="900" height="550">
+    <img src="images/deploy.png" alt="Deploy Non-Churn Demo" width="550" height="250">
 </div>
 
 ---
 
 <br/>
 <div align="center">
-    <img src="images/function_deploy.png" alt="Deploy Churn Demo" width="900" height="750">
+    <img src="images/function_deploy.png" alt="Deploy Churn Demo" width="550" height="550">
 </div>
 
 
@@ -613,8 +613,8 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 ## Roadmap
 
-- [Notebook-1-EDA](https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/notebooks/0_EDA.ipynb)
-- [Notebook-2-Modeling](https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/notebooks/1_Modeling.ipynb)
+- [Notebook-1-EDA](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/notebooks/0_EDA.ipynb)
+- [Notebook-2-Modeling](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/notebooks/1_Modeling.ipynb)
 
 
 See the [open issues](https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/issues) for a full list of proposed features (and known issues).
@@ -635,8 +635,8 @@ If you have a suggestion that would make this better, please fork the repo and c
 ### Top contributors:
 
 <br/>
-<a href="https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch" alt="contrib.rocks image" />
+<a href="https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=OtnielGomes/Churn-Prediction-Credit-Card" alt="contrib.rocks image" />
 </a>
 
 
@@ -646,7 +646,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 ## License
 
-Distributed under the MIT License. See [`LICENSE.txt`](https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/blob/main/LICENSE) for more information.
+Distributed under the MIT License. See [`LICENSE.txt`](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/blob/main/LICENSE) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
