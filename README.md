@@ -465,7 +465,7 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 ---
 <br/>
 <div align="center">
-    <img src="images/evaluation.png" alt="Scores Models" width="750" height="1800">
+    <img src="images/evaluation.png" alt="Scores Models" width="550" height="1500">
   </a>
 </div>
 <br/>
