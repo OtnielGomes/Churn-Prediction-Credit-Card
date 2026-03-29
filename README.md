@@ -304,10 +304,41 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 </div>
 <br/>
 
+---
+
+<br/><br/>
+<div align="center">
+    <img src="images/target_count.png" alt="Target Count Univariate" width="1000" height="550">
+  </a>
+</div>
+<br/>
+
+## Bi-Variate Analysis:
+---
+### Correlation of Variables x Churn
+
+<br/><br/>
+<div align="center">
+    <img src="images/corr_bi.png" alt="Correlation Bivariate" width="900" height="800">
+  </a>
+</div>
+<br/>
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <br/>
 
+---
+<br/><br/>
+<div align="center">
+    <img src="images/hist_bi.png" alt="Histogram Bivariate width="1000" height="750">
+  </a>
+</div>
+<br/>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<br/>
 
 ### 3 - Data Preparation
 ---
