@@ -385,21 +385,15 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 - For the data preparation stage, **two distinct pipelines** were developed: one designed for **linear models** and the other for **tree-based models**.
 
-
 > This separation was adopted because each family of algorithms has its own preprocessing requirements, especially with regard to **scaling numerical variables** and **encoding categorical variables**.
 
+- Only the **`avg_open_to_buy`** variable will be dropped, due to its perfect correlation with the **`credit_limit`** variable.
 
-- As discussed in the EDA, the initial decision was to remove only the variables **`equip`** and **`wireless`**, since they showed high correlation with **`equipmon`** and **`wiremon`**, respectively.
-
-
-- The other highly correlated variables were deliberately retained at this initial stage.
-
+- The remaining variables will be retained, even though some of them may not show **relevant statistical significance** at this stage.
 
 > This decision allows the modeling process to empirically evaluate how different algorithms handle **multicollinearity**, **informational redundancy**, and the possible **marginal predictive gain** associated with these variables.
 
-
-- In both pipelines, the data preparation flow followed the same general structure:
-
+- In both pipelines, the data preparation flow will follow the same general structure:
 
 - **Variable type optimization**, with the objective of ensuring structural consistency, reducing memory usage, and adapting the data to the computational requirements of the algorithms.
 
