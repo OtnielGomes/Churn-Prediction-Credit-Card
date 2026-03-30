@@ -617,7 +617,7 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 - [Notebook-2-Modeling](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/blob/main/notebooks/1_Modeling.ipynb)
 
 
-See the [open issues](https://github.com/OtnielGomes/1_Portfolio-Credit-Card_Churn_Analysis_with_Pytorch/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
