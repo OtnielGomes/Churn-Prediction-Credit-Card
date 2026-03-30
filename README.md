@@ -594,14 +594,14 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 <br/>
 <div align="center">
-    <img src="images/deploy.png" alt="Deploy Non-Churn Demo" width="550" height="250">
+    <img src="images/function_deploy.png" alt="Deploy Non-Churn Demo" width="550" height="250">
 </div>
 
 ---
 
 <br/>
 <div align="center">
-    <img src="images/function_deploy.png" alt="Deploy Churn Demo" width="550" height="550">
+    <img src="images/output_deploy.png" alt="Deploy Churn Demo" width="550" height="550">
 </div>
 
 
@@ -641,7 +641,6 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 
 
-<!-- LICENSE -->
 <br/>
 
 ## License
@@ -650,9 +649,6 @@ Distributed under the MIT License. See [`LICENSE.txt`](https://github.com/Otniel
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- CONTACT -->
 
 <br/>
 
