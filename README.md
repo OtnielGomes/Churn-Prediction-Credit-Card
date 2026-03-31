@@ -610,11 +610,12 @@ The dependent target variable is **`Attrition_Flag`**, a categorical feature wit
 
 
 <br/>
+
 See the [open issues](https://github.com/OtnielGomes/Churn-Prediction-Credit-Card/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- CONTRIBUTING -->
+
 <br/>
 
 ## Contributing
